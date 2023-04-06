@@ -79,19 +79,31 @@ UPDATE [Disciplina]
 SET Nome = 'Inteligência Artificial', Carga_Horária = 100
 WHERE ID_Disciplina =2
 
+
+
 UPDATE [Disciplina_matricula]
-SET Falta = 666
+SET Nota_Subs = Null -- sem where de propósito
+
+UPDATE [Disciplina_matricula]
+SET Falta = 6
 WHERE ID_Matricula =3 AND ID_Disciplina =2
 SELECT * FROM [Disciplina_matricula]
 
 UPDATE [Disciplina_matricula]
-SET Situacao = 'Matriculado'
-WHERE ID_Matricula = 3 AND ID_Disciplina =2
+SET Falta = 48
+WHERE ID_Matricula = 2 AND ID_Disciplina =1
+SELECT * FROM [Disciplina_matricula]
 
-UPDATE [Disciplina_matricula] SET Nota_1 = 6.0, Nota_2 = 6.0
+UPDATE [Disciplina_matricula] SET Nota_1 = 4.0, Nota_2 = 3.0
 WHERE ID_Matricula = 3 AND ID_Disciplina = 2
+SELECT * FROM [Disciplina_matricula]
 
--- ALter Table
+UPDATE [Disciplina_matricula] SET Nota_1 = 4.0, Nota_2 = 6.5
+WHERE ID_Matricula = 2 AND ID_Disciplina = 1
+SELECT * FROM [Disciplina_matricula]
+
+
+-- Alter Table
 ALTER TABLE [Disciplina_matricula]
 ADD
  Media              NUMERIC(4,2)
@@ -106,7 +118,7 @@ FROM Aluno a JOIN Matricula m ON a.RA = m.RA_Aluno
 -- Colocando as notas e tentando tirar a média 
 DELETE [Disciplina_matricula]
 INSERT INTO [Disciplina_matricula] (ID_Matricula, ID_Disciplina, Nota_1, Nota_2, Nota_Subs, Falta, Situacao)
-VALUES (1, 1, 6.50, 7.50, 8.0,  0, 'Matriculado')
+VALUES (1, 1, 6.5, 7.5, 8.0, 0, 'Matriculado')
 INSERT INTO [Disciplina_matricula] (ID_Matricula, ID_Disciplina, Nota_1, Nota_2, Nota_Subs, Falta, Situacao)
 VALUES (1, 2, 4.5, 7.0, 3.5, 0, 'Matriculado')
 INSERT INTO [Disciplina_matricula] (ID_Matricula, ID_Disciplina, Nota_1, Nota_2, Nota_Subs, Falta, Situacao)

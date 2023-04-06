@@ -1,3 +1,5 @@
+USE Controle_de_Notas;
+GO
 
 CREATE OR ALTER TRIGGER TGR_Media_INsert ON [Disciplina_matricula] AFTER UPDATE-- Depois de atualizar dados nesta tabela
 --Esta trigger sempre é executada ap-s um UPDATE na nossa tabela, poderia ser feito em qqr DML
@@ -23,16 +25,21 @@ AS
 BEGIN
     IF (UPDATE(Media)) -- só vai executar se houver um UPDATE na coluna Media
     BEGIN
-        DECLARE @ID_Matricula INT, @ID_Disciplina INT, @Media NUMERIC (4,2), @Situacao VARCHAR(19)
-        SELECT @ID_Matricula = ID_Matricula, @ID_Disciplina = ID_Disciplina, @Situacao = Situacao, @Media = Media FROM INSERTED
+        DECLARE @ID_Matricula INT, @ID_Disciplina INT, @Media NUMERIC (4,2), @Situacao VARCHAR(19), @Falta SMALLINT, @Carga SMALLINT
+        
+        SELECT @ID_Matricula = ID_Matricula, @ID_Disciplina = i.ID_Disciplina, @Situacao = Situacao, @Media = Media, @Falta = i.Falta, @Carga = Carga_Horária
+        FROM inserted i
+        JOIN [Disciplina] d ON i.ID_Disciplina = d.ID_Disciplina 
         SET @Situacao = CASE 
-            WHEN (@Media >= 5) THEN 'Aprovado'
+            WHEN (@Media >= 5)THEN 'Aprovado'
             ELSE 'Reprovado'
         END
             PRINT(@Situacao) -- Só para mostrar a atual situação.
 
-         UPDATE[Disciplina_matricula] SET Situacao = @Situacao  
-         WHERE ID_Matricula = @ID_Matricula AND ID_Disciplina = @ID_Disciplina   --(SUPER!!) SEMPRE COLOCAR ONDE VAI SER FEIRA A ALTERAÇÃO PQ SENÃO TUDO É ALTERADO!!
+         UPDATE[Disciplina_matricula] 
+         SET Situacao = @Situacao  
+         WHERE ID_Matricula = @ID_Matricula 
+         AND ID_Disciplina = @ID_Disciplina   --(SUPER!!) SEMPRE COLOCAR ONDE VAI SER FEIRA A ALTERAÇÃO PQ SENÃO TUDO É ALTERADO!!
     END
 END;
 GO
@@ -42,21 +49,21 @@ AS
 BEGIN
     IF (UPDATE(Falta))
     BEGIN        
-        DECLARE @ID_Matricula INT, @ID_Disciplina INT, @Falta INT, @Carga SMALLINT, @Situacao VARCHAR(19)
+        DECLARE @ID_Matricula INT, @ID_Disciplina INT, @Falta INT, @Carga SMALLINT, @Situacao VARCHAR(19), @Media NUMERIC(4,2)
 
-        SELECT @ID_Matricula = i.ID_Matricula, @ID_Disciplina = i.ID_Disciplina, @Falta = i.Falta, @Carga = d.Carga_Horária, @Situacao = i.Situacao 
+        SELECT @ID_Matricula = i.ID_Matricula, @ID_Disciplina = i.ID_Disciplina, @Falta = i.Falta, @Carga = d.Carga_Horária, @Situacao = i.Situacao, @Media = i.Media
         FROM inserted i
         JOIN [Disciplina] d ON i.ID_Disciplina = d.ID_Disciplina              
 
         SET @Situacao = CASE 
-            WHEN (@Falta > (@Carga / 2)) THEN 'Reprovado_Faltas'
+            WHEN (@Falta > (@Carga / 2)) THEN 'Reprovado_Faltas'            
             ELSE 'Aprovado'
         END
-        PRINT(@Situacao)
 
-        UPDATE[Disciplina_matricula] SET Situacao = @Situacao        
-        WHERE ID_Matricula = @ID_Matricula AND ID_Disciplina = @ID_Disciplina
-        PRINT('Passei aqui')
+        UPDATE[Disciplina_matricula]
+        SET Situacao = @Situacao        
+        WHERE ID_Matricula = @ID_Matricula 
+        AND ID_Disciplina = @ID_Disciplina       
     END
 END;
 GO
